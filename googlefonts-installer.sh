@@ -12,6 +12,7 @@
 #  (but completely re-written)
 #
 
+OSTYPE=$(uname -s);
 GITROOT="https://github.com/google/fonts.git";
 FONTDIR="/usr/share/fonts/truetype/google-fonts";
 
@@ -28,6 +29,18 @@ if ! exists git ; then
     echo "Git is required (hint: sudo apt-get install git)!" 1>&2;
     exit 1;
 fi
+
+case "$OSTYPE" in
+    Linux)
+        FONTDIR="/usr/share/fonts/truetype/google-fonts";
+        ;;
+    Darwin)
+        FONTDIR="/Library/Fonts/google-fonts";
+        ;;
+    *)
+        exit 0
+        ;;
+esac
 
 mkdir -p "$FONTDIR";
 
@@ -46,7 +59,9 @@ echo -n "Installing fonts... "
 find $TMPDIR/ -name '*.ttf' -exec install -m644 {} "$FONTDIR" \;
 echo "done!"
 
-echo "Updating font cache... "
-fc-cache -fvs "$FONTDIR";
+if [ $OSTYPE == "Linux" ]; then
+    echo "Updating font cache... "
+    fc-cache -fvs "$FONTDIR";
+fi
 
 echo "All done!"
